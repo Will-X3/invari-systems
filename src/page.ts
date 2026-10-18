@@ -4,17 +4,18 @@
  * static HTML — readable without JavaScript and by crawlers. The browser
  * bundle (src/main.ts) only adds interactions on top.
  */
-import { Header } from "./components/Header";
-import { Hero } from "./components/Hero";
-import { Thesis } from "./components/Thesis";
-import { Laws } from "./components/Laws";
-import { Architecture } from "./components/Architecture";
-import { Verification } from "./components/Verification";
-import { Scope } from "./components/Scope";
-import { Whitepaper } from "./components/Whitepaper";
-import { Closing, Footer } from "./components/Closing";
-import { site } from "./config/site";
-import { esc } from "./lib/html";
+import { Header } from './components/Header';
+import { Hero } from './components/Hero';
+import { Thesis } from './components/Thesis';
+import { Laws } from './components/Laws';
+import { Architecture } from './components/Architecture';
+import { Verification } from './components/Verification';
+import { Scope } from './components/Scope';
+import { Whitepaper } from './components/Whitepaper';
+import { Closing, Footer } from './components/Closing';
+import { site } from './config/site';
+import { esc } from './lib/html';
+import { harness } from './content/harness';
 
 export function renderBody(): string {
   return [
@@ -28,15 +29,45 @@ export function renderBody(): string {
     Scope(),
     Whitepaper(),
     Closing(),
-    "</main>",
+    '</main>',
     Footer(),
-  ].join("\n");
+  ].join('\n');
 }
+
+/** Other properties that belong to the same organization (schema.org sameAs). */
+const sameAs = ['https://invari.app', 'https://invari.shop', harness.repoUrl];
 
 export function renderHead(): string {
   const t = esc(site.title);
   const d = esc(site.description);
   const u = esc(site.url);
+  const og = `${u}og-image.png?v=2`;
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Organization',
+        '@id': `${site.url}#organization`,
+        name: site.name,
+        url: site.url,
+        logo: {
+          '@type': 'ImageObject',
+          url: `${site.url}brand/InvariMascot.png`,
+        },
+        description: site.description,
+        sameAs,
+      },
+      {
+        '@type': 'WebSite',
+        '@id': `${site.url}#website`,
+        url: site.url,
+        name: site.name,
+        description: site.description,
+        publisher: { '@id': `${site.url}#organization` },
+        inLanguage: 'en',
+      },
+    ],
+  };
   return `
     <title>${t}</title>
     <meta name="description" content="${d}" />
@@ -52,18 +83,13 @@ export function renderHead(): string {
     <meta property="og:title" content="${t}" />
     <meta property="og:description" content="${d}" />
     <meta property="og:url" content="${u}" />
-    <meta property="og:image" content="${u}og-image.png" />
+    <meta property="og:image" content="${og}" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Invari Systems — Trust the evidence. Not the assertion." />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="${t}" />
     <meta name="twitter:description" content="${d}" />
-    <meta name="twitter:image" content="${u}og-image.png" />
-    <script type="application/ld+json">${JSON.stringify({
-      "@context": "https://schema.org",
-      "@type": "Organization",
-      name: site.name,
-      url: site.url,
-    })}</script>`;
+    <meta name="twitter:image" content="${og}" />
+    <script type="application/ld+json">${JSON.stringify(jsonLd)}</script>`;
 }

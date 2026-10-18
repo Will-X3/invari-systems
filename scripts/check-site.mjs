@@ -57,7 +57,7 @@ const required = [
   ['viewport', /<meta name="viewport"/],
 ];
 for (const [name, re] of required) (re.test(html) ? ok : (m) => fail.push(`Missing ${m}`))(name);
-for (const f of ['robots.txt', 'sitemap.xml', 'favicon.svg', 'og-image.png', 'site.webmanifest'])
+for (const f of ['robots.txt', 'sitemap.xml', 'favicon.svg', 'og-image.png', 'site.webmanifest', 'llms.txt'])
   existsSync(join(dist, f)) ? ok(`${f} present`) : fail.push(`Missing ${f}`);
 
 // confidentiality guard
