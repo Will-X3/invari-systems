@@ -7,6 +7,7 @@ import '@fontsource/ibm-plex-mono/latin-500.css';
 import './styles/tokens.css';
 import './styles/base.css';
 import './styles/sections.css';
+import { inject } from '@vercel/analytics';
 
 import { initNav } from './scripts/nav';
 import { initHeroMotion } from './scripts/heroMotion';
@@ -32,3 +33,4 @@ run('architecture', initArchitecture);
 run('race', () => initRace(reducedMotion));
 run('explorer', initExplorer);
 run('copy', initCopy);
+run('analytics', () => inject());
