@@ -110,7 +110,12 @@ function Explorer(): string {
               <div><dt>Status</dt><dd>${esc(statusMeta[e.status].label)}</dd></div>
               <div><dt>Method</dt><dd>${esc(e.method)}</dd></div>
               <div><dt>Laws</dt><dd>${e.laws.length ? e.laws.map((n) => `<a href="#law-${n}">${pad2(n)}</a>`).join(' ') : 'Architecture'}</dd></div>
-              ${harnessCases.filter((h) => h.evidenceIds.includes(e.id)).map((h) => `<div><dt>Reproduce</dt><dd><a href="#harness-${h.id.toLowerCase()}">Run case ${esc(h.id)} yourself →</a></dd></div>`).join('')}
+              ${(() => {
+                const hs = harnessCases.filter((h) => h.evidenceIds.includes(e.id));
+                return hs.length
+                  ? `<div><dt>Reproduce</dt><dd>${hs.map((h) => `<a href="#harness-${h.id.toLowerCase()}">Run case ${esc(h.id)}</a>`).join(' · ')} →</dd></div>`
+                  : '';
+              })()}
               <div><dt>Register refs</dt><dd class="mono">${esc(e.refs.join(' · '))}</dd></div>
             </dl>
           </div>

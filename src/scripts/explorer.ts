@@ -41,6 +41,15 @@ export function initExplorer(): void {
   /** Open and reveal a record when navigated to by hash. */
   const openFromHash = () => {
     const id = location.hash.slice(1);
+    if (/^harness-[a-z0-9]+$/.test(id)) {
+      const hc = document.getElementById(id);
+      const d = hc?.querySelector('details');
+      if (hc && d) {
+        d.open = true;
+        requestAnimationFrame(() => hc.scrollIntoView({ block: 'start' }));
+      }
+      return;
+    }
     if (!/^ev-\d+$/.test(id)) return;
     const li = document.getElementById(id) as HTMLLIElement | null;
     if (!li) return;

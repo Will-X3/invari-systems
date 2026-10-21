@@ -9,56 +9,36 @@ function CodeLine(code: string, label: string): string {
 }
 
 function Case(c: HarnessCase): string {
+  const id = c.id.toLowerCase();
+  const isFail = c.expect === 'FAIL';
   return `
-  <article class="hcase" id="harness-${c.id.toLowerCase()}" aria-labelledby="harness-${c.id.toLowerCase()}-title">
-    <header class="hcase__head">
-      <p class="mono-label"><span class="hcase__id">${esc(c.id)}</span> · Published ${esc(c.date)}</p>
-      <h4 class="hcase__title" id="harness-${c.id.toLowerCase()}-title">${esc(c.title)}</h4>
-      <p class="hcase__summary">${esc(c.summary)}</p>
-    </header>
-
-    <ol class="hsteps">
-      <li>
-        <p class="hsteps__t">Get the evidence</p>
-        ${CodeLine(`git clone ${harness.cloneUrl}\ncd invari-verify`, 'Clone the repository')}
-        <p class="hsteps__note">This case’s evidence is in <code>${esc(c.folder)}/</code>: the signed chain export, the signed receipt, and a README. The verifier source is in <code>kernel/</code>.</p>
-      </li>
-      <li>
-        <p class="hsteps__t">Compare the key — don’t trust the folder</p>
-        <p class="hsteps__note">The folder carries its own <code>public-keys.json</code>. A forged folder could carry a forged key, so check it against the copy published on this page, below.</p>
-      </li>
-      <li>
-        <p class="hsteps__t">Run the verifier</p>
-        ${CodeLine(c.command, 'Verifier command')}
-        <p class="hsteps__note">It checks the case against the head published in <code>CHECKPOINTS.md</code> and on this page. Expected, with exit code 0:</p>
-        <pre class="hsteps__expect"><code>${esc(c.expected)}</code></pre>
-      </li>
-      <li>
-        <p class="hsteps__t">Try to break it</p>
-        <p class="hsteps__note">Change any value inside a chain entry in <code>${esc(c.folder)}/asset-export.json</code> and run it again: the verifier reports <code>RESULT: FAIL</code> and names the entry whose content no longer matches its hash. Case <code>T1</code> in the repo is exactly that, committed so you can see a failure: <code>node verify-all.js T1</code>.</p>
-      </li>
-    </ol>
-
-    <div class="hcase__grid">
-      <div>
-        <p class="mono-label">What a PASS establishes</p>
-        <ul class="hlist">${c.checks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+  <li class="hc${isFail ? ' hc--fail' : ''}" id="harness-${id}">
+    <details class="hc__details">
+      <summary class="hc__summary">
+        <span class="hc__id">${esc(c.id)}</span>
+        <span class="hc__title">${esc(c.title)}</span>
+        <span class="hc__refusal mono">${esc(c.refusal)}</span>
+        <span class="hc__expect hc__expect--${c.expect.toLowerCase()}"><span class="hc__expect-k">Expect </span>${esc(c.expect)}</span>
+      </summary>
+      <div class="hc__body">
+        <p class="hc__text">${esc(c.summary)}</p>
+        ${CodeLine(`node verify-all.js ${c.id}`, `Run case ${c.id}`)}
+        <p class="hsteps__note">Expected:</p>
+        <pre class="hsteps__expect${isFail ? ' hsteps__expect--fail' : ''}"><code>${esc(c.expected)}</code></pre>
+        ${c.note ? `<p class="hc__note">${esc(c.note)}</p>` : ''}
+        <dl class="hcase__meta">
+          ${c.publishedHead ? `<div><dt>Published head (${esc(c.publishedHead.version)})</dt><dd class="mono hcase__hash">${esc(c.publishedHead.hash)}</dd></div>` : ''}
+          <div><dt>Refused</dt><dd>${esc(c.refusedAt)}</dd></div>
+          <div><dt>Backs</dt><dd>${c.evidenceIds.map((e) => `<a href="#${e}" data-evidence-link="${e}">${esc(e.toUpperCase())}</a>`).join(' · ')} · Law${c.laws.length > 1 ? 's' : ''} ${c.laws.map((n) => `<a href="#law-${n}">${pad2(n)}</a>`).join(' ')}</dd></div>
+          <div><dt>Evidence</dt><dd><a href="${esc(harness.repoUrl)}/tree/main/cases/${esc(c.id)}" target="_blank" rel="noopener">cases/${esc(c.id)} on GitHub <span aria-hidden="true">↗</span><span class="visually-hidden">(opens in a new tab)</span></a></dd></div>
+        </dl>
       </div>
-      <div>
-        <p class="mono-label hlist__warn">What it does not prove</p>
-        <ul class="hlist">${c.doesNotProve.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
-      </div>
-    </div>
-
-    <dl class="hcase__meta">
-      <div><dt>Published head (${esc(c.publishedHead.version)})</dt><dd class="mono hcase__hash">${esc(c.publishedHead.hash)}</dd></div>
-      <div class="hcase__meta-note"><dd>${esc(c.publishedHead.note)}</dd></div>
-      <div><dt>Backs</dt><dd>${c.evidenceIds.map((id) => `<a href="#${id}" data-evidence-link="${id}">${esc(id.toUpperCase())}</a>`).join(' · ')} · Laws ${c.laws.map((n) => `<a href="#law-${n}">${pad2(n)}</a>`).join(' ')}</dd></div>
-    </dl>
-  </article>`;
+    </details>
+  </li>`;
 }
 
 export function Harness(): string {
+  const passCount = harnessCases.filter((c) => c.expect === 'PASS').length;
   const keys = harness.publicKeys
     .map(
       (k) => `<div class="hkey">
@@ -74,11 +54,50 @@ export function Harness(): string {
       <div>
         <p class="mono-label">Open verification harness</p>
         <h3 class="subhead subhead--flush" id="verify-yourself-title">Don’t take our word for it. Run it.</h3>
-        <p class="harness__lede">Each published case is a folder of real evidence and the verifier’s source code. Checking it needs only Node.js and Invari’s public key — no npm install, no network and no Invari server. New cases are added as the system progresses; <code>${esc(harness.runAll)}</code> runs every one against its expected result.</p>
+        <p class="harness__lede">${passCount} real refusals and one deliberate tamper test, each with its signed evidence and the verifier’s source. Checking them needs only Node.js and Invari’s public key — no npm install, no network and no Invari server. New cases are added as the system progresses.</p>
       </div>
       <a class="button button--ghost" href="${esc(harness.repoUrl)}" target="_blank" rel="noopener">Open the harness on GitHub <span aria-hidden="true">↗</span></a>
     </div>
-    ${harnessCases.map(Case).join('')}
+
+    <div class="hcase">
+      <ol class="hsteps">
+        <li>
+          <p class="hsteps__t">Get the evidence</p>
+          ${CodeLine(`git clone ${harness.cloneUrl}\ncd invari-verify`, 'Clone the repository')}
+          <p class="hsteps__note">Each case is a folder in <code>cases/</code>: the signed chain export, the signed receipt, and a README. The verifier source is in <code>kernel/</code>.</p>
+        </li>
+        <li>
+          <p class="hsteps__t">Compare the key — don’t trust the folder</p>
+          <p class="hsteps__note">Check the repository’s <code>public-keys.json</code> against the key published on this page, below. A forged repository could carry its own key.</p>
+        </li>
+        <li>
+          <p class="hsteps__t">Run every case</p>
+          ${CodeLine(harness.runAll, 'Run every case')}
+          <p class="hsteps__note">Each case is checked against its expected result and the head published in <code>CHECKPOINTS.md</code>. Expected, with exit code 0:</p>
+          <pre class="hsteps__expect"><code>${esc(
+            harnessCases.map((c) => `${c.id.padEnd(6)}  ${c.expect.padEnd(9)}  ${c.expect.padEnd(7)}  as expected`).join('\n') + '\n\nALL CASES AS EXPECTED',
+          )}</code></pre>
+        </li>
+        <li>
+          <p class="hsteps__t">Try to break it</p>
+          <p class="hsteps__note">Change any value inside a chain entry in a case’s <code>asset-export.json</code> and run that case again: it fails and names the entry. Case T1 is exactly that, committed so you can see a failure.</p>
+        </li>
+      </ol>
+
+      <p class="mono-label hc-list__label">The cases · select one for details</p>
+      <ul class="hc-list">${harnessCases.map(Case).join('')}</ul>
+
+      <div class="hcase__grid">
+        <div>
+          <p class="mono-label">What a PASS establishes</p>
+          <ul class="hlist">${harness.checks.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        </div>
+        <div>
+          <p class="mono-label hlist__warn">What it does not prove</p>
+          <ul class="hlist">${harness.doesNotProve.map((x) => `<li>${esc(x)}</li>`).join('')}</ul>
+        </div>
+      </div>
+    </div>
     ${keys}
   </div>`;
 }
