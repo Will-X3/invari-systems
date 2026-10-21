@@ -20,8 +20,8 @@ function Case(c: HarnessCase): string {
     <ol class="hsteps">
       <li>
         <p class="hsteps__t">Get the evidence</p>
-        ${CodeLine(`git clone ${harness.cloneUrl}\ncd invari-verify-m1\nunzip ${c.archive}`, 'Clone the repository and extract the evidence')}
-        <p class="hsteps__note">On Windows PowerShell: <code>Expand-Archive ${esc(c.archive)} .</code></p>
+        ${CodeLine(`git clone ${harness.cloneUrl}\ncd invari-verify`, 'Clone the repository')}
+        <p class="hsteps__note">This case’s evidence is in <code>${esc(c.folder)}/</code>: the signed chain export, the signed receipt, and a README. The verifier source is in <code>kernel/</code>.</p>
       </li>
       <li>
         <p class="hsteps__t">Compare the key — don’t trust the folder</p>
@@ -30,12 +30,12 @@ function Case(c: HarnessCase): string {
       <li>
         <p class="hsteps__t">Run the verifier</p>
         ${CodeLine(c.command, 'Verifier command')}
-        <p class="hsteps__note">Expected, with exit code 0:</p>
+        <p class="hsteps__note">It checks the case against the head published in <code>CHECKPOINTS.md</code> and on this page. Expected, with exit code 0:</p>
         <pre class="hsteps__expect"><code>${esc(c.expected)}</code></pre>
       </li>
       <li>
         <p class="hsteps__t">Try to break it</p>
-        <p class="hsteps__note">Change any value inside a chain entry in <code>asset-export.json</code> and run it again. The verifier reports <code>RESULT: FAIL</code> and names the entry whose content no longer matches its hash.</p>
+        <p class="hsteps__note">Change any value inside a chain entry in <code>${esc(c.folder)}/asset-export.json</code> and run it again: the verifier reports <code>RESULT: FAIL</code> and names the entry whose content no longer matches its hash. Case <code>T1</code> in the repo is exactly that, committed so you can see a failure: <code>node verify-all.js T1</code>.</p>
       </li>
     </ol>
 
@@ -74,7 +74,7 @@ export function Harness(): string {
       <div>
         <p class="mono-label">Open verification harness</p>
         <h3 class="subhead subhead--flush" id="verify-yourself-title">Don’t take our word for it. Run it.</h3>
-        <p class="harness__lede">Each published case is a folder of real evidence and the verifier’s source code. Checking it needs only Node.js and Invari’s public key — no npm install, no network and no Invari server. New cases are added to the harness as the system progresses.</p>
+        <p class="harness__lede">Each published case is a folder of real evidence and the verifier’s source code. Checking it needs only Node.js and Invari’s public key — no npm install, no network and no Invari server. New cases are added as the system progresses; <code>${esc(harness.runAll)}</code> runs every one against its expected result.</p>
       </div>
       <a class="button button--ghost" href="${esc(harness.repoUrl)}" target="_blank" rel="noopener">Open the harness on GitHub <span aria-hidden="true">↗</span></a>
     </div>

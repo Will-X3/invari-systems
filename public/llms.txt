@@ -29,7 +29,7 @@ invari.systems presents the architecture, its Ten Laws of Governed Autonomy, and
 
 ## Independent verification
 
-- [invari-verify-m1 on GitHub](https://github.com/Will-X3/invari-verify-m1): case M1 — a refused proposal checked without Invari. The verifier recomputes every chain hash, checks Ed25519 signatures against the published key, confirms the signed proposal targeted the recorded head, and confirms nothing was written from it. It states plainly what it does not prove: the rejection outcome itself is not yet signed.
+- [invari-verify on GitHub](https://github.com/Will-X3/invari-verify): refused proposals anyone can check without Invari, plus a deliberate tamper test (T1) that must fail. `node verify-all.js` runs every case. Case M1 is a refused proposal checked without Invari. The verifier recomputes every chain hash, checks Ed25519 signatures against the published key, confirms the signed proposal targeted the recorded head, and confirms nothing was written from it. It states plainly what it does not prove: the rejection receipt's outcome is not yet signed (the separate refusal record is signed since 17 October 2026).
 
 ## Current limits (as published on the site)
 

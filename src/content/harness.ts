@@ -9,8 +9,10 @@
  */
 
 export const harness = {
-  repoUrl: 'https://github.com/Will-X3/invari-verify-m1',
-  cloneUrl: 'https://github.com/Will-X3/invari-verify-m1.git',
+  repoUrl: 'https://github.com/Will-X3/invari-verify',
+  cloneUrl: 'https://github.com/Will-X3/invari-verify.git',
+  /** Runs every case in the repo against its expected result. */
+  runAll: 'node verify-all.js',
   requirements: 'Node.js (any current LTS). No npm install, no network, no Invari server.',
   /** Invari's published signing keys, keyed by signingKeyId. */
   publicKeys: [
@@ -27,7 +29,7 @@ export interface HarnessCase {
   title: string;
   date: string;
   summary: string;
-  archive: string;
+  folder: string;
   command: string;
   expected: string;
   publishedHead: { version: string; hash: string; note: string };
@@ -44,9 +46,8 @@ export const harnessCases: HarnessCase[] = [
     date: '11 October 2026',
     summary:
       'A second “manufactured” event was proposed for an asset whose chain already began with one. The kernel refused it (MANUFACTURE_NOT_GENESIS). The evidence folder contains the asset’s signed chain export, the signed refusal receipt and the verifier source. All data is synthetic, pre-pilot test data.',
-    archive: 'm1-evidence.zip',
-    command:
-      'node kernel/tools/verifyRejection.js asset-export.json receipt-rcpt_88524a38e31849d08063a6083705e8aa.json public-keys.json --expect-head 67d764054abf00d4533b755c66c4f1bea5f2a4020c409fbe37e8e118ffdc78dc',
+    folder: 'cases/M1',
+    command: 'node verify-all.js M1',
     expected: 'RESULT: PASS -- signed proposal against an intact chain; nothing written from it',
     publishedHead: {
       version: 'v1',
