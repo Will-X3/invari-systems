@@ -79,7 +79,7 @@ export const laws: Law[] = [
     mechanism:
       'Every proposal receives a receipt before evaluation begins. Committed entries are sealed with their inputs and signed. Accepted and rejected outcomes are recorded in parallel, durable stores.',
     status: 'partial',
-    statusNote: 'Accepted entries are sealed and signed; a rejection’s final outcome is not yet signed.',
+    statusNote: 'Accepted entries and refusal records are sealed and signed; a rejection receipt’s final outcome is not yet signed.',
     evidence: ['ev-04', 'ev-05', 'ev-06'],
   },
   {

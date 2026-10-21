@@ -166,7 +166,7 @@ export function Verification(): string {
     </ul>
     ${Harness()}
     ${Explorer()}
-    <p class="provenance-note">Source: Invari.kOS architecture and engineering workbook, registers current to 18 October 2026. All evidence was produced against pre-pilot environments holding synthetic data. Nothing on this page is a live connection to a running kernel.</p>
+    <p class="provenance-note">Source: Invari.kOS architecture and engineering workbook, registers reconciled 21 October 2026. All evidence was produced against pre-pilot environments holding synthetic data. Nothing on this page is a live connection to a running kernel.</p>
   </div>
 </section>`;
 }

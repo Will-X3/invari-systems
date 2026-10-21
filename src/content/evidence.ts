@@ -5,7 +5,7 @@ import type { Status } from './status';
  *
  * Source: the Invari.kOS architecture and engineering workbook (Whitepaper
  * Claims, Architecture Principles, Bug / TODO / Remediation registers,
- * Adversarial Tests, QUORUM and RTE readiness sheets), read on 18 Oct 2026.
+ * Adversarial Tests, QUORUM and RTE readiness sheets), reconciled 21 Oct 2026.
  * Every statement below is a restatement of a recorded entry. Nothing here is
  * a live measurement. "refs" are the workbook's own finding IDs so an
  * internal reviewer can trace each record back to its row.
@@ -128,10 +128,10 @@ export const evidence: EvidenceRecord[] = [
     evidence: [
       'A standalone verifier checks a refused proposal from an exported evidence folder: the chain verifies, the receipt’s input commitment recomputes and its signature verifies, the proposal targeted the recorded state version, and no entry was written from it.',
       'Run against a recorded live refusal: PASS.',
-      'Refusal records are sealed whole and signed; they reference — rather than copy — the prior ledger entry.',
+      'Since 17 October 2026, every refusal record is sealed whole — what was attempted, the reason, the actor — and signed with the same key as the ledger. Changing any field breaks the seal; the record references, rather than copies, the prior ledger entry.',
     ],
     limits: [
-      'The rejection receipt signs its inputs, but not yet its final outcome and reason code. The verifier therefore reports the outcome as UNSIGNED. This gap is open and publicly acknowledged.',
+      'The rejection receipt — the record the published verifier checks — signs its inputs but not yet its final outcome and reason code, so the verifier reports the receipt’s outcome as UNSIGNED. The separate refusal record is signed; signing the receipt outcome is open.',
       'The endpoint for verifying a refusal chain is implemented but not yet routed.',
     ],
     method: 'Standalone verifier run on a live refusal; check scripts.',
@@ -165,12 +165,13 @@ export const evidence: EvidenceRecord[] = [
     evidence: [
       'The evaluation timestamp is pinned and the chain head is read from the transaction snapshot.',
       'Clock reads previously sealed into entries have been removed.',
+      'Policies no longer write during evaluation: the state change one policy used to make mid-evaluation is now applied inside the commit transaction, verified in a live run.',
     ],
     limits: [
       'Some policies still read the database and the clock during evaluation. Until they do not, replay-based audit is a design objective rather than an established property.',
     ],
     method: 'Code review against the whitepaper claim.',
-    refs: ['Claim 3', 'B-22', 'R-109'],
+    refs: ['Claim 3', 'R-109'],
   },
   {
     id: 'ev-09',
@@ -186,6 +187,7 @@ export const evidence: EvidenceRecord[] = [
     ],
     limits: [
       'Demonstrated in the first governed domain only. A general mechanism that scales required authority with consequence or irreversibility is not yet documented.',
+      'For the consumer-sale path, the human-proposer rule is covered by check scripts but has not yet been run live; that path is outside the current pilot.',
     ],
     method: 'Live runs, chain verification and check scripts.',
     refs: ['P-04', 'P-05', 'R-82', 'R-84'],
@@ -301,7 +303,7 @@ export const evidence: EvidenceRecord[] = [
  * Bug Register or TODO Register — they cover different scopes.
  */
 export const remediationSnapshot = {
-  date: '18 October 2026',
+  date: '21 October 2026',
   register: 'Remediation Findings register',
   scope:
     'Findings discovered during the kOS v4 remediation itself — through tests, live end-to-end runs and code review — not the original architecture audit.',

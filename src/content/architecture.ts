@@ -51,7 +51,7 @@ export const archSteps: ArchStep[] = [
 export const nodeStatus: Record<string, { status: Status; note: string }> = {
   kernel: { status: 'tested', note: 'Commit path, receipts and version check tested' },
   accepted: { status: 'external', note: 'Signed chain verified by a third party' },
-  rejected: { status: 'partial', note: 'Signed refusals; outcome signature open' },
+  rejected: { status: 'partial', note: 'Refusal records sealed and signed; receipt outcome not yet signed' },
   matrix: { status: 'implemented', note: 'Matrix pipeline built; some fields placeholder' },
   isa: { status: 'specified', note: 'Specified wire format not yet built' },
 };
