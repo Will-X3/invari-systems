@@ -11,8 +11,10 @@
  */
 import { readFileSync, existsSync, readdirSync, statSync } from 'node:fs';
 import { join, extname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const dist = new URL('../dist/', import.meta.url).pathname;
+// fileURLToPath, not URL.pathname: on Windows .pathname gives '/C:/...', which doesn't exist.
+const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const fail = [];
 const ok = (m) => console.log(`  ✓ ${m}`);
 
