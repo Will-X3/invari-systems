@@ -1,6 +1,7 @@
 import { esc } from '../lib/html';
 import { archSteps, concepts, nodeStatus } from '../content/architecture';
 import { SectionHead, StatusBadge } from './StatusBadge';
+import { CommitFlow } from './CommitFlow';
 
 const badge = (node: string) => {
   const s = nodeStatus[node];
@@ -199,6 +200,7 @@ export function Architecture(): string {
       ${Diagram()}
       ${Steps()}
     </div>
+    ${CommitFlow()}
     ${RaceDemo()}
     <h3 class="subhead">Concepts, and how far each is built</h3>
     <ul class="concepts">${cards}</ul>
