@@ -1077,6 +1077,7 @@
 .snap-bar__seg--unexercised, .snap__swatch--unexercised { background: var(--s-implemented); }
 .snap-bar__seg--partial, .snap__swatch--partial { background: var(--s-partial); }
 .snap-bar__seg--open, .snap__swatch--open { background: var(--s-open); }
+.snap-bar__seg--other, .snap__swatch--other { background: var(--s-principle); }
 .snap__rows { display: grid; }
 .snap__row {
   display: grid;

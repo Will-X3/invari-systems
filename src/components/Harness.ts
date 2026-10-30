@@ -28,8 +28,8 @@ function Case(c: HarnessCase): string {
         ${c.note ? `<p class="hc__note">${esc(c.note)}</p>` : ''}
         <dl class="hcase__meta">
           ${c.publishedHead ? `<div><dt>Published head (${esc(c.publishedHead.version)})</dt><dd class="mono hcase__hash">${esc(c.publishedHead.hash)}</dd></div>` : ''}
-          <div><dt>Refused</dt><dd>${esc(c.refusedAt)}</dd></div>
-          <div><dt>Backs</dt><dd>${c.evidenceIds.map((e) => `<a href="#${e}" data-evidence-link="${e}">${esc(e.toUpperCase())}</a>`).join(' · ')} · Law${c.laws.length > 1 ? 's' : ''} ${c.laws.map((n) => `<a href="#law-${n}">${pad2(n)}</a>`).join(' ')}</dd></div>
+          <div><dt>${esc(c.dateLabel ?? 'Refused')}</dt><dd>${esc(c.refusedAt)}</dd></div>
+          <div><dt>Backs</dt><dd>${c.evidenceIds.map((e) => `<a href="#${e}" data-evidence-link="${e}">${esc(e.toUpperCase())}</a>`).join(' · ')}${c.laws.length ? ` · Law${c.laws.length > 1 ? 's' : ''} ${c.laws.map((n) => `<a href="#law-${n}">${pad2(n)}</a>`).join(' ')}` : ''}</dd></div>
           <div><dt>Evidence</dt><dd><a href="${esc(harness.repoUrl)}/tree/main/cases/${esc(c.id)}" target="_blank" rel="noopener">cases/${esc(c.id)} on GitHub <span aria-hidden="true">↗</span><span class="visually-hidden">(opens in a new tab)</span></a></dd></div>
         </dl>
       </div>
@@ -37,8 +37,14 @@ function Case(c: HarnessCase): string {
   </li>`;
 }
 
+const COUNT_WORDS = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten'];
+const countWord = (n: number) => COUNT_WORDS[n] ?? String(n);
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export function Harness(): string {
-  const passCount = harnessCases.filter((c) => c.expect === 'PASS').length;
+  const refusals = harnessCases.filter((c) => c.kind === 'refusal' || c.kind === 'record').length;
+  const accepted = harnessCases.filter((c) => c.kind === 'accepted').length;
+  const tamper = harnessCases.filter((c) => c.kind === 'tamper').length;
   const keys = harness.publicKeys
     .map(
       (k) => `<div class="hkey">
@@ -54,7 +60,7 @@ export function Harness(): string {
       <div>
         <p class="mono-label">Open verification harness</p>
         <h3 class="subhead subhead--flush" id="verify-yourself-title">Don’t take our word for it. Run it.</h3>
-        <p class="harness__lede">${passCount} real refusals and one deliberate tamper test, each with its signed evidence and the verifier’s source. Checking them needs only Node.js and Invari’s public key — no npm install, no network and no Invari server. New cases are added as the system progresses.</p>
+        <p class="harness__lede">${cap(countWord(refusals))} real refusals, ${countWord(accepted)} accepted act${accepted === 1 ? '' : 's'} with the signed human judgments behind it, and ${countWord(tamper)} deliberate tamper test${tamper === 1 ? '' : 's'} — each with its signed evidence and the verifier’s source. Checking them needs only Node.js and Invari’s public key — no npm install, no network and no Invari server. New cases are added as the system progresses.</p>
       </div>
       <a class="button button--ghost" href="${esc(harness.repoUrl)}" target="_blank" rel="noopener">Open the harness on GitHub <span aria-hidden="true">↗</span></a>
     </div>
@@ -64,7 +70,7 @@ export function Harness(): string {
         <li>
           <p class="hsteps__t">Get the evidence</p>
           ${CodeLine(`git clone ${harness.cloneUrl}\ncd invari-verify`, 'Clone the repository')}
-          <p class="hsteps__note">Each case is a folder in <code>cases/</code>: the signed chain export, the signed receipt, and a README. The verifier source is in <code>kernel/</code>.</p>
+          <p class="hsteps__note">Each case is a folder in <code>cases/</code> with a README: a kernel refusal carries the signed chain export and the signed receipt, a workflow refusal its signed refusal record, an accepted act a whole chain export with its affirmations. The verifier source is in <code>kernel/</code>.</p>
         </li>
         <li>
           <p class="hsteps__t">Compare the key — don’t trust the folder</p>

@@ -68,7 +68,7 @@ export const laws: Law[] = [
       'K=STRICT: every input class — time, evidence, nature classification, identity, policy, capability — begins failed closed and becomes valid only when its required conditions are affirmatively established. A receipt that never resolves before its deadline is rejected.',
     status: 'partial',
     statusNote: 'Fail-closed defaults enforced in the kernel; one transport-layer fail-open path awaits a design decision.',
-    evidence: ['ev-07', 'ev-04', 'ev-06'],
+    evidence: ['ev-07', 'ev-04', 'ev-06', 'ev-16', 'ev-19'],
   },
   {
     n: 5,
@@ -80,7 +80,7 @@ export const laws: Law[] = [
       'Every proposal receives a receipt before evaluation begins. Committed entries are sealed with their inputs and signed. Accepted and rejected outcomes are recorded in parallel, durable stores.',
     status: 'partial',
     statusNote: 'Accepted entries and refusal records are sealed and signed; a rejection receipt’s final outcome is not yet signed.',
-    evidence: ['ev-04', 'ev-05', 'ev-06'],
+    evidence: ['ev-04', 'ev-05', 'ev-06', 'ev-17'],
   },
   {
     n: 6,
@@ -91,8 +91,8 @@ export const laws: Law[] = [
     mechanism:
       'Canonical state is a derivation of an ordered, append-only event sequence. Each record incorporates the hash of its predecessor and is signed, so alteration, deletion, insertion or reordering is detectable against an independently trusted chain head.',
     status: 'external',
-    statusNote: 'A chain export has been verified by a third party with only the public key. Published checkpoints are not yet built.',
-    evidence: ['ev-05'],
+    statusNote: 'Chain exports and refusal records verify with only the public key; corrections append. Heads are published after the fact; anchoring at commit time is not yet built.',
+    evidence: ['ev-05', 'ev-18', 'ev-17'],
   },
   {
     n: 7,
@@ -114,9 +114,9 @@ export const laws: Law[] = [
     why: 'Most real failures are not one forbidden step but several allowed ones. A boundary that checks only individual operations can be walked through one step at a time.',
     mechanism:
       'Each proposal is evaluated against current canonical state — which already reflects every prior commit — rather than in isolation.',
-    status: 'principle',
-    statusNote: 'No dedicated sequence-level evaluation mechanism is documented in the supplied engineering record.',
-    evidence: [],
+    status: 'partial',
+    statusNote: 'Evaluated over resulting state: a duplicate acquisition is refused (harness M6), and adjusted values are re-checked before sealing. No analysis of action sequences beyond current state.',
+    evidence: ['ev-16'],
   },
   {
     n: 9,

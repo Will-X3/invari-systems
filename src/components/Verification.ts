@@ -145,7 +145,7 @@ function Explorer(): string {
     <p class="explorer__count" data-explorer-count aria-live="polite"></p>
     <ul class="evs">${records}</ul>
     <div class="explorer__empty" data-explorer-empty hidden>
-      <p>No evidence records match this filter. That absence is itself information — for example, Laws 08 and 09 have no linked implementation evidence.</p>
+      <p>No evidence records match this filter. That absence is itself information — for example, Law 09 has no linked implementation evidence.</p>
       <button type="button" class="button button--small button--ghost" data-explorer-reset>Clear filters</button>
     </div>
   </div>`;

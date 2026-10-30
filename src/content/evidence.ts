@@ -5,7 +5,8 @@ import type { Status } from './status';
  *
  * Source: the Invari.kOS architecture and engineering workbook (Whitepaper
  * Claims, Architecture Principles, Bug / TODO / Remediation registers,
- * Adversarial Tests, QUORUM and RTE readiness sheets), reconciled 21 Oct 2026.
+ * Adversarial Tests, QUORUM and RTE readiness sheets), reconciled 21 Oct 2026;
+ * ev-16 to ev-19, ev-05 / ev-06 and the remediation snapshot updated 29 Oct 2026.
  * Every statement below is a restatement of a recorded entry. Nothing here is
  * a live measurement. "refs" are the workbook's own finding IDs so an
  * internal reviewer can trace each record back to its row.
@@ -112,7 +113,7 @@ export const evidence: EvidenceRecord[] = [
       'The verifier needs no database, network access or Invari packages.',
     ],
     limits: [
-      'Hash chaining detects alteration, insertion, deletion or reordering relative to a chain head that is independently trusted. Signed, externally published chain-head checkpoints are not yet built.',
+      'Hash chaining detects alteration, insertion, deletion or reordering relative to a chain head that is independently trusted. Chain heads for the published cases are recorded in the harness’s git-timestamped CHECKPOINTS.md, but they were published after the events; anchoring heads outside Invari at commit time is not yet built.',
       'Whoever holds the private signing key can sign. The key remains the one trusted secret; its storage and rotation procedure is a pre-pilot gate.',
     ],
     method: 'Independent verification of an exported chain with the public key only.',
@@ -129,12 +130,13 @@ export const evidence: EvidenceRecord[] = [
       'A standalone verifier checks a refused proposal from an exported evidence folder: the chain verifies, the receipt’s input commitment recomputes and its signature verifies, the proposal targeted the recorded state version, and no entry was written from it.',
       'Run against a recorded live refusal: PASS.',
       'Since 17 October 2026, every refusal record is sealed whole — what was attempted, the reason, the actor — and signed with the same key as the ledger. Changing any field breaks the seal; the record references, rather than copies, the prior ledger entry.',
+      'A workflow refusal — refused before anything reached the kernel — is published in the harness with its signed record (case R1), and a copy with one word of the message changed fails (T2).',
     ],
     limits: [
       'The rejection receipt — the record the published verifier checks — signs its inputs but not yet its final outcome and reason code, so the verifier reports the receipt’s outcome as UNSIGNED. The separate refusal record is signed; signing the receipt outcome is open.',
       'The endpoint for verifying a refusal chain is implemented but not yet routed.',
     ],
-    method: 'Standalone verifier run on a live refusal; check scripts.',
+    method: 'Standalone verifier run on live refusals; open harness cases R1 and T2; check scripts.',
     refs: ['Claim 12', 'R-95', 'R-76', 'R-123', 'T-31'],
   },
   {
@@ -294,24 +296,104 @@ export const evidence: EvidenceRecord[] = [
     method: 'Pre-implementation readiness review.',
     refs: ['Claim 9', 'QR-01', 'QR-03', 'QR-10'],
   },
+  {
+    id: 'ev-16',
+    title: 'What is sealed is what was validated',
+    status: 'tested',
+    laws: [4, 8],
+    claim:
+      'A policy may adjust a proposal before it is sealed. Whatever it changes, the rules that depend on that value are checked again on the final version, so authority is evaluated over the resulting state, not the state as submitted.',
+    evidence: [
+      'Every policy declares what it reads, what it may change and in what order it runs. The kernel refuses to start if two policies conflict without saying how, and refuses any change a policy did not declare.',
+      'Policies whose rule reads a value another policy changed run again on the final version, and each re-check is recorded in the entry’s trace.',
+      'Recorded live runs: a delivery and an acquisition each re-checked their sealed custody state and firearm identity after adjustment. Before the fix, one such adjustment caused every business-to-business acquisition to be refused.',
+      'A firearm acquired while already held is refused against current state (open harness case M6).',
+    ],
+    limits: [
+      'The check for undeclared changes looks at top-level fields and individual metadata keys; a change made inside a nested object is not caught.',
+      'Evaluation is over current state and the declared rules. A general analysis of action sequences beyond current state is not built.',
+    ],
+    method: 'Check scripts (39 contract checks, 25 of which fail on the previous engine) and recorded live runs.',
+    refs: ['B-10', 'R-168', 'R-117'],
+  },
+  {
+    id: 'ev-17',
+    title: 'A bulk import leaves sealed evidence of itself',
+    status: 'tested',
+    laws: [5, 6],
+    claim:
+      'When a licensee loads its existing records, the ledger records which file produced which entries — so the old bound book can be closed against something an auditor can check.',
+    evidence: [
+      'Every entry an import writes names the file’s SHA-256 fingerprint and the row it came from.',
+      'One record on the licensee’s own chain seals the file’s fingerprint and size, its row counts, and a digest of every entry the import committed — written whether rows were accepted or refused.',
+      'Recorded live run: a verifier given the licensee’s kept file proved it produced exactly those entries; a copy differing by one byte failed; re-uploading the same file was refused.',
+    ],
+    limits: [
+      'Invari does not store the file — the licensee keeps it. Without the exact file, only the entries and their digest can be checked.',
+      'The import verifier reads Invari’s database; it is not yet part of the open harness.',
+      'The record carries no file name or refusal reasons, since those can contain a person’s details.',
+    ],
+    method: 'Check scripts and a recorded live run.',
+    refs: ['R-167', 'R-23'],
+  },
+  {
+    id: 'ev-18',
+    title: 'Corrections append; the original stays',
+    status: 'tested',
+    laws: [6],
+    claim:
+      'A wrong entry is corrected by a new entry that references it. The original is never rewritten, and the record shows both.',
+    evidence: [
+      'A licensee corrects declared fields of an earlier entry with a new correction entry; the original stays on the chain, and the bound book prints the corrected value with a column naming what changed, when and why.',
+      'An entry recorded in error closes its record and names the replacement; the bound book keeps the voided row with a note.',
+      'Who may correct follows the sealed role of the original; a self-correction is marked as one. Identity fields cannot be corrected in place.',
+      'Recorded live runs covered every refusal and both kinds of correction.',
+    ],
+    limits: [
+      'Corrections of facts two licensees share — which would need both to affirm — are designed but not built.',
+    ],
+    method: 'Check scripts and recorded live runs.',
+    refs: ['T-29'],
+  },
+  {
+    id: 'ev-19',
+    title: 'Typed regulated facts are checked, not trusted',
+    status: 'tested',
+    laws: [4],
+    claim:
+      'Where a person still has to type a regulated fact — who a firearm came from — a malformed value is refused rather than recorded.',
+    evidence: [
+      'A licensee number must have the structure of a federal firearms license — six segments, a real region, license type and expiration month — and is sealed in one canonical form, so the same licensee is not recorded three ways.',
+      'A private party’s address must name a US state and a ZIP code that belongs to it.',
+      'A licensee already on Invari that the licensee has received from can be picked instead of typed; the name and number then come from that licensee’s own record.',
+      'Recorded live runs: a malformed license number and an out-of-state ZIP were refused with the reason; a number typed without dashes was sealed in canonical form.',
+    ],
+    limits: [
+      'The checks are structural. A well-formed license number is not proof the license was issued or is current.',
+      'Licensee numbers recorded at onboarding are not yet held to the same check.',
+    ],
+    method: 'Check scripts and recorded live runs.',
+    refs: ['T-27'],
+  },
 ];
 
 /**
  * Remediation register snapshot. Counted directly from the "Resolution (v4)"
- * column of the workbook's "Remediation Findings" sheet (128 rows), and
- * matching the counts recorded on its Read Me. Do not add counts from the
+ * column of the workbook's "Remediation Findings" sheet, and
+ * matching the counts recorded on its Read Me (168 rows on 29 Oct 2026). Do not add counts from the
  * Bug Register or TODO Register — they cover different scopes.
  */
 export const remediationSnapshot = {
-  date: '21 October 2026',
+  date: '29 October 2026',
   register: 'Remediation Findings register',
   scope:
     'Findings discovered during the kOS v4 remediation itself — through tests, live end-to-end runs and code review — not the original architecture audit.',
-  total: 128,
+  total: 168,
   rows: [
-    { key: 'verified', label: 'Fixed — verified', value: 89, note: 'Proven by committed tests or a recorded live run.' },
-    { key: 'unexercised', label: 'Fixed — not yet exercised', value: 6, note: 'Code changed; no real application flow has run through it yet.' },
-    { key: 'partial', label: 'Partially fixed', value: 6, note: 'Some of the fix is in place; the remainder is recorded.' },
-    { key: 'open', label: 'Open', value: 27, note: 'Not yet addressed.' },
+    { key: 'verified', label: 'Fixed — verified', value: 130, note: 'Proven by committed tests or a recorded live run.' },
+    { key: 'unexercised', label: 'Fixed — not yet exercised', value: 4, note: 'Code changed; no real application flow has run through it yet.' },
+    { key: 'partial', label: 'Partially fixed', value: 5, note: 'Some of the fix is in place; the remainder is recorded.' },
+    { key: 'open', label: 'Open', value: 26, note: 'Not yet addressed.' },
+    { key: 'other', label: 'Fixed or closed without a recorded verification', value: 3, note: 'Two fixes whose verification is not recorded, and one finding closed as not reproducible.' },
   ],
 } as const;
