@@ -1,0 +1,62 @@
+/* Design tokens. The site is intentionally dark-only: the identity is a
+   graphite "systems laboratory". Colors meet WCAG AA against --bg. */
+:root {
+  color-scheme: dark;
+
+  --bg: #0b0c0e;
+  --bg-raised: #111317;
+  --bg-raised-2: #161920;
+  --bg-sunken: #08090b;
+  --line: rgba(232, 230, 225, 0.08);
+  --line-strong: rgba(232, 230, 225, 0.16);
+  --line-accent: rgba(118, 214, 232, 0.35);
+
+  --text: #e9e7e2;
+  --text-muted: #a3a19b;
+  --text-faint: #7c7b76;
+
+  --accent: #76d6e8;
+  --accent-strong: #a4e7f3;
+  --accent-wash: rgba(118, 214, 232, 0.08);
+  --accent-wash-2: rgba(118, 214, 232, 0.16);
+
+  --commit: #76d6e8;
+  --reject: #e8957a;
+  --reject-wash: rgba(232, 149, 122, 0.1);
+
+  /* Evidence status palette */
+  --s-external: #8fe3c2;
+  --s-tested: #76d6e8;
+  --s-implemented: #9fb3cf;
+  --s-partial: #e3c27a;
+  --s-specified: #b6a8e6;
+  --s-open: #e8957a;
+  --s-principle: #a3a19b;
+
+  --font-sans: 'IBM Plex Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.86rem);
+  --step-0: clamp(1rem, 0.97rem + 0.15vw, 1.08rem);
+  --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.35rem);
+  --step-2: clamp(1.4rem, 1.25rem + 0.75vw, 1.85rem);
+  --step-3: clamp(1.85rem, 1.5rem + 1.6vw, 2.9rem);
+  --step-4: clamp(2.5rem, 1.8rem + 3.4vw, 4.75rem);
+
+  --gutter: clamp(16px, 4vw, 40px);
+  --container: 1200px;
+  --radius: 3px;
+  --header-h: 76px;
+
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+  }
+}

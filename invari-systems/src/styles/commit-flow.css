@@ -1,0 +1,245 @@
+/* =========================================================
+   "From one commit to every consumer" (components/CommitFlow.ts)
+   Without JS everything is shown in its final state. With JS
+   (.is-enhanced) elements start dim and light up as the sequence plays.
+   ========================================================= */
+.cf {
+  margin-top: clamp(48px, 7vw, 80px);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--bg-raised);
+  padding: clamp(18px, 3vw, 32px);
+}
+.cf__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.cf__h { font-size: var(--step-1); font-weight: 500; margin-bottom: 6px; }
+.cf__lede { color: var(--text-muted); font-size: 0.92rem; max-width: 50em; }
+
+.cf__k {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 6px;
+}
+.cf__k--reject { color: var(--reject); }
+
+/* Pipeline */
+.cf__pipe {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 28px;
+}
+.cf__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  transition: border-color 0.35s var(--ease), box-shadow 0.35s var(--ease), opacity 0.35s var(--ease);
+}
+.cf__title { font-weight: 500; font-size: 0.98rem; line-height: 1.3; margin-bottom: 8px; }
+.cf__title--commit { font-family: var(--font-mono); letter-spacing: 0.08em; color: var(--commit); }
+.cf__lines { display: grid; align-content: start; gap: 4px; font-size: 0.82rem; color: var(--text-muted); flex: 1; }
+.cf__status { margin-top: 10px; }
+
+/* Connector between stages (horizontal on desktop) */
+.cf__stage:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: -28px;
+  width: 28px;
+  height: 1px;
+  background: var(--line-strong);
+}
+.cf__stage:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  top: calc(50% - 3px);
+  right: -28px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0;
+}
+.cf__stage.is-flow:not(:last-child)::before { background: var(--accent); }
+.cf__stage.is-flow:not(:last-child)::after { animation: cf-dot-x 0.7s var(--ease) forwards; }
+@keyframes cf-dot-x {
+  0% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(22px); }
+}
+
+/* Bus to consumers */
+.cf__bus {
+  position: relative;
+  margin-top: 28px;
+  padding-top: 26px;
+  border-top: 1px solid var(--line-strong);
+  transition: border-color 0.35s var(--ease);
+}
+.cf__bus::before {
+  /* drop from the last stage down to the bus */
+  content: '';
+  position: absolute;
+  top: -28px;
+  right: 12.5%;
+  width: 1px;
+  height: 28px;
+  background: var(--line-strong);
+  transition: background-color 0.35s;
+}
+.cf__bus-k {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-bottom: 12px;
+}
+.cf__consumers {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+.cf__consumer {
+  padding: 12px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius);
+  background: var(--bg);
+  transition: border-color 0.35s var(--ease), background-color 0.35s var(--ease), box-shadow 0.35s;
+}
+.cf__cname { font-weight: 500; font-size: 0.92rem; }
+.cf__crole { font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; min-height: 2.5em; }
+.cf__ver { margin-top: 8px; font-size: 0.78rem; }
+.cf__ver-k { font-family: var(--font-mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-faint); }
+.cf__ver code { color: var(--accent); transition: color 0.3s; }
+.cf__loop {
+  margin-top: 14px;
+  font-size: 0.84rem;
+  color: var(--accent);
+  transition: opacity 0.4s var(--ease);
+}
+
+/* Bypass lane */
+.cf__bypass {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 1.2fr);
+  gap: 20px;
+  align-items: center;
+  margin-top: 24px;
+  padding: 16px 18px;
+  border: 1px dashed color-mix(in srgb, var(--reject) 50%, transparent);
+  border-radius: var(--radius);
+  background: var(--reject-wash);
+  transition: opacity 0.35s var(--ease);
+}
+.cf__bypass-title {
+  font-weight: 500;
+  text-decoration: line-through;
+  text-decoration-color: var(--reject);
+}
+.cf__bypass-store {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  transition: opacity 0.35s;
+}
+.cf__checks { display: grid; gap: 6px; font-size: 0.84rem; color: var(--text-muted); }
+.cf__checks li { display: flex; gap: 10px; align-items: baseline; transition: opacity 0.35s var(--ease), transform 0.35s var(--ease); }
+.cf__x { color: var(--reject); font-family: var(--font-mono); }
+.cf__bypass-out { font-size: 0.86rem; color: var(--text); transition: opacity 0.35s; }
+.cf__bypass-out code { color: var(--accent); }
+.cf__bypass-out a { color: var(--accent); font-size: 0.8rem; white-space: nowrap; }
+
+/* Controls */
+.cf__controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 22px;
+}
+.cf__live {
+  flex: 1 1 260px;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-faint);
+  min-height: 1.2em;
+}
+
+/* ---------- Enhanced (JS) states ---------- */
+.cf.is-enhanced .cf__stage { opacity: 0.4; }
+.cf.is-enhanced .cf__stage.is-on {
+  opacity: 1;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent), 0 0 28px -10px rgba(118, 214, 232, 0.4);
+}
+.cf.is-enhanced .cf__stage:first-child.is-on {
+  border-color: var(--commit);
+}
+.cf.is-enhanced .cf__bus { border-top-color: var(--line); }
+.cf.is-enhanced .cf__bus.is-on { border-top-color: var(--accent); }
+.cf.is-enhanced .cf__bus.is-on::before { background: var(--accent); }
+.cf.is-enhanced .cf__consumer { opacity: 0.55; }
+.cf.is-enhanced .cf__consumer .cf__ver code { color: var(--text-muted); }
+.cf.is-enhanced .cf__consumer.is-on {
+  opacity: 1;
+  border-color: var(--accent);
+  background: var(--accent-wash);
+}
+.cf.is-enhanced .cf__consumer.is-on .cf__ver code { color: var(--accent); }
+.cf.is-enhanced .cf__consumer.is-held {
+  box-shadow: 0 0 0 1px var(--s-external);
+}
+.cf.is-enhanced .cf__loop { opacity: 0; }
+.cf.is-enhanced .cf__loop.is-on { opacity: 1; }
+
+.cf.is-enhanced .cf__bypass { opacity: 0.45; }
+.cf.is-enhanced .cf__bypass.is-on { opacity: 1; }
+.cf.is-enhanced .cf__bypass-store { opacity: 0; }
+.cf.is-enhanced .cf__bypass-store.is-on { opacity: 1; }
+.cf.is-enhanced .cf__checks li { opacity: 0; transform: translateX(-6px); }
+.cf.is-enhanced .cf__checks li.is-on { opacity: 1; transform: none; }
+.cf.is-enhanced .cf__bypass-out { opacity: 0; }
+.cf.is-enhanced .cf__bypass-out.is-on { opacity: 1; }
+/* Before the bypass is played, keep its explanation readable as a preview. */
+.cf.is-enhanced .cf__bypass:not(.is-on) .cf__checks li,
+.cf.is-enhanced .cf__bypass:not(.is-on) .cf__bypass-store,
+.cf.is-enhanced .cf__bypass:not(.is-on) .cf__bypass-out { opacity: 1; transform: none; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 960px) {
+  .cf__pipe { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .cf__stage:nth-child(2n)::before,
+  .cf__stage:nth-child(2n)::after { display: none; }
+  .cf__consumers { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .cf__bypass { grid-template-columns: 1fr; gap: 12px; }
+  .cf__bus::before { display: none; }
+}
+@media (max-width: 560px) {
+  .cf__pipe { grid-template-columns: 1fr; gap: 22px; }
+  .cf__stage:not(:last-child)::before,
+  .cf__stage:not(:last-child)::after { display: block; }
+  .cf__stage:not(:last-child)::before {
+    top: auto; bottom: -22px; right: auto; left: 24px; width: 1px; height: 22px;
+  }
+  .cf__stage:not(:last-child)::after { top: auto; bottom: -6px; right: auto; left: 21px; }
+  .cf__stage.is-flow:not(:last-child)::after { animation-name: cf-dot-y; }
+  .cf__consumers { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@keyframes cf-dot-y {
+  0% { opacity: 1; transform: translateY(-18px); }
+  100% { opacity: 0; transform: translateY(0); }
+}
