@@ -78,8 +78,8 @@ export const concepts: Concept[] = [
   },
   {
     title: 'Deterministic evaluation',
-    body: 'evaluate(S, ΔS, A, P, C, E, T, K, N) → ACCEPTED | REJECTED, with no wall-clock reads, network calls or randomness, so any past decision can be replayed. This is the specified design; the engineering record shows some policies still read the clock and database.',
-    status: 'open',
+    body: 'evaluate(S, ΔS, A, P, C, E, T, K, N) → ACCEPTED | REJECTED, with no wall-clock reads, network calls or randomness, so any past decision can be replayed. Since 5 November 2026 policies read only a sealed, in-transaction view of the ledger and never the clock; a replay tool is not yet built.',
+    status: 'partial',
     evidence: 'ev-08',
   },
   {

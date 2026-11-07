@@ -6,7 +6,8 @@ import type { Status } from './status';
  * Source: the Invari.kOS architecture and engineering workbook (Whitepaper
  * Claims, Architecture Principles, Bug / TODO / Remediation registers,
  * Adversarial Tests, QUORUM and RTE readiness sheets), reconciled 21 Oct 2026;
- * ev-16 to ev-19, ev-05 / ev-06 and the remediation snapshot updated 29 Oct 2026.
+ * ev-16 to ev-19, ev-05 / ev-06 and the remediation snapshot updated 29 Oct 2026;
+ * ev-05, ev-08, ev-13, ev-14, ev-16 and the snapshot updated 6 Nov 2026.
  * Every statement below is a restatement of a recorded entry. Nothing here is
  * a live measurement. "refs" are the workbook's own finding IDs so an
  * internal reviewer can trace each record back to its row.
@@ -111,13 +112,14 @@ export const evidence: EvidenceRecord[] = [
       'Each ledger entry is canonicalized, hashed with its predecessor and sealed with an Ed25519 signature.',
       'A platform chain export was verified by a third party using only the published Ed25519 public key: every hash recomputed, every signature verified and the master root matched.',
       'The verifier needs no database, network access or Invari packages.',
+      'Since 5 November 2026 each entry also seals the context it was evaluated against — the context bundle hash and the instant it was pinned — inside the signed hash. Harness case V1 verifies an export mixing both formats; T4, with one context anchor changed, fails on that entry.',
     ],
     limits: [
       'Hash chaining detects alteration, insertion, deletion or reordering relative to a chain head that is independently trusted. Chain heads for the published cases are recorded in the harness’s git-timestamped CHECKPOINTS.md, but they were published after the events; anchoring heads outside Invari at commit time is not yet built.',
       'Whoever holds the private signing key can sign. The key remains the one trusted secret; its storage and rotation procedure is a pre-pilot gate.',
     ],
     method: 'Independent verification of an exported chain with the public key only.',
-    refs: ['Claim 8', 'Claim 13', 'T-03', 'T-31'],
+    refs: ['Claim 8', 'Claim 13', 'T-03', 'T-31', 'T-44'],
   },
   {
     id: 'ev-06',
@@ -160,7 +162,7 @@ export const evidence: EvidenceRecord[] = [
   {
     id: 'ev-08',
     title: 'Deterministic evaluation of recorded inputs',
-    status: 'open',
+    status: 'partial',
     laws: [2, 5],
     claim:
       'evaluate(S, ΔS, A, P, C, E, T, K, N) is a pure function of explicitly recorded inputs, so any past decision can be re-executed and reproduced.',
@@ -168,12 +170,15 @@ export const evidence: EvidenceRecord[] = [
       'The evaluation timestamp is pinned and the chain head is read from the transaction snapshot.',
       'Clock reads previously sealed into entries have been removed.',
       'Policies no longer write during evaluation: the state change one policy used to make mid-evaluation is now applied inside the commit transaction, verified in a live run.',
+      'Since 5 November 2026 no policy receives a database handle or reads the clock. Each reads the ledger only through a read-only view the kernel builds inside the transaction that commits the entry, limited to the chains it declares; what it read is sealed in the entry’s trace.',
+      'Policy bundles are kept append-only by version, so the bundle that governed a past entry stays available to evaluate it against.',
     ],
     limits: [
-      'Some policies still read the database and the clock during evaluation. Until they do not, replay-based audit is a design objective rather than an established property.',
+      'Entries written before 5 November 2026 were evaluated by policies that could still read the database directly; they cannot be replayed from the record alone.',
+      'A replay tool that re-runs a past decision from its sealed inputs is not yet built or published.',
     ],
-    method: 'Code review against the whitepaper claim.',
-    refs: ['Claim 3', 'R-109'],
+    method: 'Check scripts (68 purity checks) and recorded live runs.',
+    refs: ['Claim 3', 'R-109', 'T-66', 'T-78', 'T-79', 'R-181'],
   },
   {
     id: 'ev-09',
@@ -255,13 +260,14 @@ export const evidence: EvidenceRecord[] = [
       'A single compact, self-verifying encoding of governed state is what every consumer — UI and AI alike — decodes, so their pictures of the world cannot diverge.',
     evidence: [
       'A compact state encoding is already produced when an entity’s matrix is rebuilt.',
+      'The shared vocabulary every matrix type is written in has a neutral name and a version (5 Nov 2026). Its integrity field now reports all five states and reads INSUFFICIENT when nothing was checked, and a fact sourced from test fixtures can no longer be sealed into a matrix as truth.',
     ],
     limits: [
       'Transport frames currently use a general-purpose format. The specified wire encoding is not built, as the code itself records.',
       'The current encoding does not yet carry every field the specification requires, including its integrity fields.',
     ],
     method: 'Code review; server log observation.',
-    refs: ['Claim 16', 'W-02'],
+    refs: ['Claim 16', 'W-02', 'T-74', 'M-02', 'M-05'],
   },
   {
     id: 'ev-14',
@@ -272,13 +278,17 @@ export const evidence: EvidenceRecord[] = [
       'The kernel does not interpret law. Regulatory judgment lives in versioned, externally audited policy bundles.',
     evidence: [
       'Policy bundles are re-verified against their hashes on every load and fail loudly on mismatch.',
+      'Since 6 November 2026 bundles are versioned and append-only: a version is never overwritten or deleted, so the law that governed an entry stays on record. Every stored field is covered by a hash computed in one canonical form.',
+      'A certification binds to the exact text it was made against, including any section it cites. If that text changes, or the law it cites is amended, the bundle is refused as the bundle in force until the node returns to a human gate — automation ends at once; a person decides again.',
+      'Regulatory text is carried character for character: ingestion refuses rather than drops text it cannot place.',
       'A design exists to move licence-type authority into counsel-reviewed domain data evaluated by a pure policy.',
     ],
     limits: [
       'One onboarding policy still hard-codes regulatory reference data in code. Only a small number of event types have a certified bundle today.',
+      'The firearms bundles’ text was assembled by hand, not ingested from one retrieved source document, so its fidelity to the source is recorded as unverified. Certifications are interim self-certifications for the shadow pilot, not yet counsel’s.',
     ],
     method: 'Code review.',
-    refs: ['Claim 14', 'Claim 15', 'B-46', 'T-16'],
+    refs: ['Claim 14', 'Claim 15', 'B-46', 'T-16', 'T-57', 'R-179', 'R-183'],
   },
   {
     id: 'ev-15',
@@ -306,15 +316,15 @@ export const evidence: EvidenceRecord[] = [
     evidence: [
       'Every policy declares what it reads, what it may change and in what order it runs. The kernel refuses to start if two policies conflict without saying how, and refuses any change a policy did not declare.',
       'Policies whose rule reads a value another policy changed run again on the final version, and each re-check is recorded in the entry’s trace.',
+      'Undeclared changes are caught at any depth: a change inside a nested object is a write like any other (5 Nov 2026).',
       'Recorded live runs: a delivery and an acquisition each re-checked their sealed custody state and firearm identity after adjustment. Before the fix, one such adjustment caused every business-to-business acquisition to be refused.',
       'A firearm acquired while already held is refused against current state (open harness case M6).',
     ],
     limits: [
-      'The check for undeclared changes looks at top-level fields and individual metadata keys; a change made inside a nested object is not caught.',
       'Evaluation is over current state and the declared rules. A general analysis of action sequences beyond current state is not built.',
     ],
-    method: 'Check scripts (39 contract checks, 25 of which fail on the previous engine) and recorded live runs.',
-    refs: ['B-10', 'R-168', 'R-117'],
+    method: 'Check scripts (50 policy-contract checks) and recorded live runs.',
+    refs: ['B-10', 'R-168', 'R-117', 'T-67'],
   },
   {
     id: 'ev-17',
@@ -380,20 +390,20 @@ export const evidence: EvidenceRecord[] = [
 /**
  * Remediation register snapshot. Counted directly from the "Resolution (v4)"
  * column of the workbook's "Remediation Findings" sheet, and
- * matching the counts recorded on its Read Me (168 rows on 29 Oct 2026). Do not add counts from the
+ * matching the counts recorded on its Read Me (185 rows on 6 Nov 2026). Do not add counts from the
  * Bug Register or TODO Register — they cover different scopes.
  */
 export const remediationSnapshot = {
-  date: '29 October 2026',
+  date: '6 November 2026',
   register: 'Remediation Findings register',
   scope:
     'Findings discovered during the kOS v4 remediation itself — through tests, live end-to-end runs and code review — not the original architecture audit.',
-  total: 168,
+  total: 185,
   rows: [
-    { key: 'verified', label: 'Fixed — verified', value: 130, note: 'Proven by committed tests or a recorded live run.' },
+    { key: 'verified', label: 'Fixed — verified', value: 138, note: 'Proven by committed tests or a recorded live run.' },
     { key: 'unexercised', label: 'Fixed — not yet exercised', value: 4, note: 'Code changed; no real application flow has run through it yet.' },
     { key: 'partial', label: 'Partially fixed', value: 5, note: 'Some of the fix is in place; the remainder is recorded.' },
-    { key: 'open', label: 'Open', value: 26, note: 'Not yet addressed.' },
-    { key: 'other', label: 'Fixed or closed without a recorded verification', value: 3, note: 'Two fixes whose verification is not recorded, and one finding closed as not reproducible.' },
+    { key: 'open', label: 'Open', value: 34, note: 'Not yet addressed.' },
+    { key: 'other', label: 'Fixed or closed without a recorded verification', value: 4, note: 'Three fixes whose verification is recorded outside the register’s standard wording, and one finding closed as not reproducible.' },
   ],
 } as const;

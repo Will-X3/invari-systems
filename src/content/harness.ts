@@ -29,6 +29,7 @@ export const harness = {
     'Kernel refusals (M): no entry on the chain was written from this receipt, and the signed proposal names the head the kernel evaluated it against, equal to the published checkpoint.',
     'Workflow refusals (R): the refusal record — outcome, reason code, message, actor, the attempt and both chain positions — recomputes and its signature verifies.',
     'Accepted acts (A): every ledger entry and every human affirmation in the export verifies by signature, and every affirmation a ledger entry cites is an AFFIRM.',
+    'Entry format v5 (V): entries written since 5 November 2026 also seal the context the kernel evaluated against — the context bundle hash and the instant it was pinned — inside the entry hash; earlier v4 entries verify alongside them.',
   ],
   doesNotProve: [
     'A rejection receipt signs its inputs but not yet its final outcome and reason code; the verifier prints them marked NOT SIGNED. (Since 17 October 2026 the separate refusal record is signed; signing the receipt outcome is open.)',
@@ -41,7 +42,7 @@ export const harness = {
 export interface HarnessCase {
   id: string;
   title: string;
-  /** M: kernel refusal · R: workflow refusal · A: accepted act · T: tamper test. */
+  /** M: kernel refusal · R: workflow refusal · A / V: accepted act · T: tamper test. */
   kind: 'refusal' | 'record' | 'accepted' | 'tamper';
   refusal: string;
   laws: number[];
@@ -188,6 +189,37 @@ export const harnessCases: HarnessCase[] = [
     expect: 'FAIL',
     expected:
       'RESULT: FAIL\n  - affirmationArtifacts affirmation 6ae112a4465f89eca27ae84b: content does not match entryHash\n  - affirmationArtifacts: 2 record(s) verified by signature, at least 3 required',
+    publishedHead: null,
+    evidenceIds: ['ev-05'],
+  },
+  {
+    id: 'V1',
+    kind: 'accepted',
+    title: 'Entry format v5: context anchors sealed inside each entry',
+    refusal: 'accepted act',
+    laws: [5, 6],
+    refusedAt: '7 Nov 2026',
+    dateLabel: 'Exported',
+    summary:
+      'A licensee’s export holding both entry formats: 26 entries over seven chains, v4 entries from before 5 November and v5 entries after — a firearm’s delivery and acquisition, and the export’s own record. Each v5 entry seals the context the kernel evaluated it against, inside the hash the signature covers.',
+    expect: 'PASS',
+    expected:
+      'Entries checked: 26\nNote: masterRootHash verified (SHA-256(section roots, document order))\nRESULT: PASS',
+    publishedHead: { version: 'v6', hash: 'dbbf54a2c49913739f4ca4239038703c215c217ca6c3adf87aca11c2db0ceef1' },
+    note: 'The firearm’s chain starts at v5 in this file: v1–v4 are on the manufacturer’s book, so it is reported as a partial chain whose first link points outside the export.',
+    evidenceIds: ['ev-05'],
+  },
+  {
+    id: 'T4',
+    kind: 'tamper',
+    title: 'Tamper test: V1 with one entry’s context anchor rewritten and every root recomputed',
+    refusal: 'expected failure',
+    laws: [5, 6],
+    refusedAt: '—',
+    summary:
+      'One character of one entry’s context bundle hash was changed, and every root recomputed. Ledger roots are built from entry hashes the forger cannot change without the key, so every root still verifies — only the entry’s own hash catches the edit.',
+    expect: 'FAIL',
+    expected: 'RESULT: FAIL\n  - 6ade48cfb5d791882f225948 v5: content does not match entryHash',
     publishedHead: null,
     evidenceIds: ['ev-05'],
   },
