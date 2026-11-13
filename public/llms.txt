@@ -9,7 +9,7 @@ invari.systems presents the architecture, its Ten Laws of Governed Autonomy, and
 - [Thesis — Intelligence is not authority](https://invari.systems/#thesis): why model output, prior approval or missing evidence must not become write authority.
 - [The Ten Laws of Governed Autonomy](https://invari.systems/#laws): the constitutional boundary between intelligence and authority, each with its specified mechanism and current status.
 - [Architecture](https://invari.systems/#architecture): proposers → Invari.kOS (governed execution boundary, K=STRICT fail-closed evaluation) → dual ledgers (accepted and rejected transitions) → State Compression Matrix → Shared ISA → UI and AI consumers.
-- [Verification lab](https://invari.systems/#verification): a dated remediation snapshot and 19 evidence records, each with its claim, evidence and limitations.
+- [Verification lab](https://invari.systems/#verification): a dated remediation snapshot and 20 evidence records, each with its claim, evidence and limitations.
 - [Verify it yourself](https://invari.systems/#verify-yourself): the open verification harness — real evidence and verifier source anyone can run with Node.js and Invari's published public key.
 - [Scope and limitations](https://invari.systems/#scope): what the architecture does not claim.
 - [Whitepaper](https://invari.systems/#whitepaper): Invari.kOS — The Execution Runtime Kernel (v1.1, 2026). Public edition pending approval.
@@ -29,7 +29,7 @@ invari.systems presents the architecture, its Ten Laws of Governed Autonomy, and
 
 ## Independent verification
 
-- [invari-verify on GitHub](https://github.com/Will-X3/invari-verify): evidence anyone can check without Invari. `node verify-all.js` runs every case. Kernel refusals (M1, M2, M3, M6): the verifier recomputes every chain hash, checks Ed25519 signatures against the published key, confirms the signed proposal targeted the recorded head, and confirms nothing was written from it. A workflow refusal (R1) is checked from its signed refusal record. An accepted act (A1) is checked from a whole chain export: every entry and every signed human affirmation, and that each affirmation the entry cites is an AFFIRM. V1 verifies an export mixing entry formats v4 and v5, whose entries seal the context they were evaluated against. Four deliberate tamper tests (T1, T2, T3, T4) must fail. It states plainly what it does not prove: the rejection receipt's outcome is not yet signed (the separate refusal record is signed since 17 October 2026).
+- [invari-verify on GitHub](https://github.com/Will-X3/invari-verify): evidence anyone can check without Invari. `node verify-all.js` runs every case. Kernel refusals (M1, M2, M3, M6): the verifier recomputes every chain hash, checks Ed25519 signatures against the published key, confirms the signed proposal targeted the recorded head, and confirms nothing was written from it. A workflow refusal (R1) is checked from its signed refusal record. Accepted acts (A1, A2, A3) are checked from whole chain exports: every entry and every signed human affirmation; each affirmation is a numbered link in its subject's chain, and each one an entry cites must still have been in force when the entry was committed (A3 includes a withdrawal). A2's entry also seals what the kernel read of the affirmation chain inside the commit, and the export must agree. V1 verifies an export mixing entry formats v4 and v5; the verifier also reads v6 (the certified policy bundle that governed the entry) and v7 (the version of the platform's own rules the kernel ran under), which no published case contains yet. Six deliberate tamper tests (T1-T6) must fail. It states plainly what it does not prove: the rejection receipt's outcome is not yet signed (the separate refusal record is signed since 17 October 2026), and the platform's genesis declaration and own rules package are not yet in a published export.
 
 ## Current limits (as published on the site)
 
@@ -37,6 +37,7 @@ invari.systems presents the architecture, its Ten Laws of Governed Autonomy, and
 - No formal load or performance benchmarks have been published.
 - The kernel governs discrete state transitions; it is not a sub-second, continuous real-time control system.
 - All published evidence comes from pre-pilot environments holding synthetic data.
+- The platform's own rules are admitted as a signed package only on throwaway databases so far; the real platform genesis is declared at the clean start after the shadow pilot.
 
 ## Related
 
