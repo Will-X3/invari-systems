@@ -1,6 +1,6 @@
 # invari.systems
 
-Public landing site for **Invari Systems** — the Invari.kOS execution-governance architecture.
+Public landing site for **Invari Systems** — Invari, a kernel-governed computing architecture: standalone authoritative applications are replaced by capabilities declared in the .Glyph grammar, rendered from committed state and committed only by Invari.kOS. The site should never present Invari as an AI governance product; AI models are one kind of proposer among several.
 
 A static, single-page site: the full page is rendered to HTML at build time (readable without JavaScript and by crawlers), and a small TypeScript bundle adds the interactions on top.
 
@@ -25,12 +25,12 @@ npm run validate   # build + check in one step
 
 `npm run build` produces a fully static `dist/` folder. Deploy it to any static host:
 
-| Host | Settings |
-|---|---|
-| Netlify | Build command `npm run build`, publish directory `dist` |
-| Vercel | Framework preset "Vite" (or "Other"), output `dist` |
-| Cloudflare Pages | Build command `npm run build`, output `dist` |
-| GitHub Pages / S3 / any web server | Upload the contents of `dist/` to the web root |
+| Host                               | Settings                                                |
+| ---------------------------------- | ------------------------------------------------------- |
+| Netlify                            | Build command `npm run build`, publish directory `dist` |
+| Vercel                             | Framework preset "Vite" (or "Other"), output `dist`     |
+| Cloudflare Pages                   | Build command `npm run build`, output `dist`            |
+| GitHub Pages / S3 / any web server | Upload the contents of `dist/` to the web root          |
 
 Point the `invari.systems` domain at the host and serve over HTTPS. The canonical URL, Open Graph URL, sitemap and robots file all assume `https://invari.systems/`; if the domain changes, update `src/config/site.ts`, `public/sitemap.xml` and `public/robots.txt`.
 

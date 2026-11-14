@@ -2,7 +2,7 @@
   "name": "invari-systems",
   "private": true,
   "version": "1.0.0",
-  "description": "Public landing site for invari.systems — the Invari.kOS execution-governance architecture.",
+  "description": "Public landing site for invari.systems — Invari, a kernel-governed computing architecture (Invari.kOS and the .Glyph grammar).",
   "type": "module",
   "engines": {
     "node": ">=20"

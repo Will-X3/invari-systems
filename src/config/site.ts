@@ -3,21 +3,21 @@
  * whitepaper asset. Everything here is read at build time.
  */
 export const site = {
-  name: 'Invari Systems',
-  domain: 'invari.systems',
-  url: 'https://invari.systems/',
-  title: 'Invari Systems — Trust the evidence. Not the assertion.',
+  name: "Invari Systems",
+  domain: "invari.systems",
+  url: "https://invari.systems/",
+  title: "Invari Systems — A kernel-governed computing architecture",
   description:
-    'Invari.kOS defines a governed execution boundary: intelligence may propose a state transition, but only a deterministic kernel evaluating state, policy, authority and evidence may commit it.',
+    "Invari is a new computing architecture. Standalone authoritative applications are replaced by kernel-governed capabilities: rules and authority declared in the .Glyph grammar, interfaces computed from committed state, and every change committed or rejected by one deterministic kernel, Invari.kOS.",
   /** Shown in the footer. Set to '' to hide. */
   copyright: `© ${new Date().getFullYear()} Invari Systems. All rights reserved.`,
 
   whitepaper: {
-    title: 'Invari.kOS — The Execution Runtime Kernel',
+    title: "Invari.kOS — The Execution Runtime Kernel",
     /** Version and date as printed on the source document. */
-    version: 'v1.1',
-    year: '2026',
-    author: 'Will Williams',
+    version: "v1.1",
+    year: "2026",
+    author: "Will Williams",
     /**
      * Path or URL of an OWNER-APPROVED public edition of the PDF.
      *
@@ -42,10 +42,10 @@ export const site = {
 } as const;
 
 export const nav = [
-  { id: 'thesis', label: 'Thesis' },
-  { id: 'laws', label: 'Ten Laws' },
-  { id: 'architecture', label: 'Architecture' },
-  { id: 'verification', label: 'Verification' },
-  { id: 'scope', label: 'Scope' },
-  { id: 'whitepaper', label: 'Whitepaper' },
+  { id: "thesis", label: "The shift" },
+  { id: "laws", label: "Ten Laws" },
+  { id: "architecture", label: "Architecture" },
+  { id: "verification", label: "Verification" },
+  { id: "scope", label: "Scope" },
+  { id: "whitepaper", label: "Whitepaper" },
 ] as const;
