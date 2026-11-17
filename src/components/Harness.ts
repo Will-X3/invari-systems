@@ -104,6 +104,16 @@ export function Harness(): string {
           )}</code></pre>
         </li>
         <li>
+          <p class="hsteps__t">Check the .Glyph files</p>
+          ${CodeLine(harness.runGlyph, "Check the .Glyph files")}
+          <p class="hsteps__note">Recomputes every published version of the vocabulary, the frame layout and the conditions grammar the kernel judges by, and checks each against <code>CHECKPOINTS.md</code>. Expected, ending <code>RESULT: PASS</code>:</p>
+          <pre class="hsteps__expect"><code>${esc(
+            harness.glyphFiles
+              .map((g) => `OK    ${g.name}@${g.version}  ${g.hash}`)
+              .join("\n"),
+          )}</code></pre>
+        </li>
+        <li>
           <p class="hsteps__t">Try to break it</p>
           <p class="hsteps__note">Change any value inside a chain entry in a case’s <code>asset-export.json</code> and run that case again: it fails and names the entry. Case T1 is exactly that, committed so you can see a failure.</p>
         </li>

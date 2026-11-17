@@ -64,7 +64,7 @@ export const paradigm = {
       invari:
         "Declared in .Glyph policy packages: a closed grammar, versioned, hashed and pinned to the source text. Every committed entry seals the policy version it was evaluated against.",
       status: "partial" as Status,
-      note: "Grammar v1 and sealed policy versions are tested. The first domain’s rules become a certified Capability package next.",
+      note: "Live since 17 November 2026: the first domain’s rules are being moved out of code into .Glyph conditions (grammar 1.1.0), carried by its certified Capability package and by the platform’s own package, and judged by the kernel. Hand-written rules remain; no second domain until they are gone.",
     },
     {
       layer: "Authority",
